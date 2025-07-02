@@ -21,17 +21,24 @@ function Navbar() {
   return (
     <nav className="shadow p-4">
       <Container>
-       <div className="flex flex-row-reverse">
-         {navlinks.map((link) => (
-          <Link
-            key={link.href}
-            className={`mr-4 ${pathname === link.href ? "text-sky-500" : ""}`}
-            href={link.href}
-          >
-            {link.title}
-          </Link>
-        ))}
-       </div>
+        <div className="flex flex-row-reverse justify-between">
+          <div>
+            {navlinks.map((link) => (
+              <Link
+                key={link.href}
+                className={`mr-4 ${
+                  pathname === link.href ? "text-sky-500" : ""
+                }`}
+                href={link.href}
+              >
+                {link.title}
+              </Link>
+            ))}
+          </div>
+          <div>
+            <Link href='/cart'>سبد خرید</Link>
+          </div>
+        </div>
       </Container>
     </nav>
   );
