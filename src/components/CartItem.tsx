@@ -1,25 +1,36 @@
-export default function CartItem() {
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { IProductItemProps } from "./ProductItem";
+import AddToCart from "./AddToCart";
+
+interface ICartItemProps {
+  id: number;
+  qty: number;
+}
+
+export default function CartItem({ id, qty }: ICartItemProps) {
+  const [data, setData] = useState({} as IProductItemProps);
+
+  useEffect(() => {
+    axios(`http://localhost:3004/products/${id}`).then((result) => {
+      const { data } = result;
+      setData(data);
+    });
+  }, []);
+
   return (
     <div className="bg-slate-100 mb-4 grid grid-cols-12">
       <div className="col-span-10 text-right p-4">
-        <h1 className="text-xl font-bold">محصول یک</h1>
+        <h1 className="text-xl font-bold">{data.title}</h1>
         <p>
-          تعداد : <span>3</span>
+          تعداد : <span>{qty}</span>
         </p>
         <p className="rtl">
-          قیمت محصول : <span>45$</span>
+          قیمت محصول : <span>{data.price}$</span>
         </p>
-        <div className="mt-4">
-          <button className="px-4 py-2 bg-sky-500 rounded text-white">+</button>
-          <span className="mx-4">3</span>
-          <button className="px-4 py-2 bg-sky-500 rounded text-white">-</button>
-        </div>
+        <AddToCart id={id.toString()} />
       </div>
-      <img
-        className="col-span-2"
-        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUPIfiGgUML8G3ZqsNLHfaCnZK3I5g4tJabQ&s"
-        alt=""
-      />
+      <img className="col-span-2" src={data.image} alt={data.title} />
     </div>
   );
 }

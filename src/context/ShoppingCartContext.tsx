@@ -14,6 +14,10 @@ type CartItems = {
 type TShoppingCartContext = {
   cartItems: CartItems[];
   handleIncreaseProductQty: (id: number) => void;
+  handleDecreaseProductQty: (id: number) => void;
+  handleRemoveProduct: (id: number) => void;
+  getProductQty: (id: number) => number;
+  cartTotalQty: number;
 };
 const ShoppingCartContext = createContext({} as TShoppingCartContext);
 
@@ -26,15 +30,23 @@ export function ShoppingCartContextProvider({
 }: ShoppingCartContextProviderProps) {
   const [cartItems, setCartItems] = useState<CartItems[]>([]);
 
+  const cartTotalQty = cartItems.reduce((totalQty, item) => {
+    return totalQty + item.qty;
+  }, 0);
+
+  const getProductQty = (id: number) => {
+    return cartItems.find((item) => item.id == id)?.qty || 0;
+  };
+
   const handleIncreaseProductQty = (id: number) => {
-    setCartItems((currentItem) => {
+    setCartItems((currentItems) => {
       const isNotProductExist =
-        currentItem.find((item) => item.id == id) == null;
+        currentItems.find((item) => item.id == id) == null;
 
       if (isNotProductExist) {
-        return [...currentItem, { id: id, qty: 1 }];
+        return [...currentItems, { id: id, qty: 1 }];
       } else {
-        return currentItem.map((item) => {
+        return currentItems.map((item) => {
           if (item.id == id) {
             return {
               ...item,
@@ -48,9 +60,40 @@ export function ShoppingCartContextProvider({
     });
   };
 
+  const handleDecreaseProductQty = (id: number) => {
+    setCartItems((currentItems) => {
+      const isLastOne = currentItems.find((item) => item.id == id)?.qty == 1;
+
+      if (isLastOne) {
+        return currentItems.filter((item) => item.id != id);
+      } else {
+        return currentItems.map((item) => {
+          if (item.id == id) {
+            return { ...item, qty: item.qty - 1 };
+          } else {
+            return item;
+          }
+        });
+      }
+    });
+  };
+
+  const handleRemoveProduct = (id: number) => {
+    setCartItems((currentItems) => {
+      return currentItems.filter((item) => item.id != id);
+    });
+  };
+
   return (
     <ShoppingCartContext.Provider
-      value={{ cartItems, handleIncreaseProductQty }}
+      value={{
+        cartItems,
+        handleIncreaseProductQty,
+        handleDecreaseProductQty,
+        handleRemoveProduct,
+        getProductQty,
+        cartTotalQty,
+      }}
     >
       {children}
     </ShoppingCartContext.Provider>
